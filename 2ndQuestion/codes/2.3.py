@@ -1,27 +1,32 @@
-double mean(char *str);
+import numpy as np
+import matplotlib.pyplot as plt
+import mpmath as mp
+simlen = 1000000
+randvar = np.loadtxt('./gau.dat',dtype='double')
 
-double mean(char *str)
-{
 
+x = np.linspace(-5,5,40)
+CF=[]
+for i in range(0,40):
+	CF_ind = np.nonzero(randvar < x[i]) 
+	CF_n = np.size(CF_ind)
+	CF.append(CF_n/simlen) 
+	
+	
+def Q(x):
+    return (1-mp.erf(x/mp.sqrt(2)))/2
+    
+def f(x):
+    return 1-Q(x)
+    
+cdf = np.vectorize(f)
 
-double temp1 = 0;
-int i=0,c;
-FILE *fp;
-double x, temp=0.0;
-
-fp = fopen(str,"r");
-//get numbers from file
-while(fscanf(fp,"%lf",&x)!=EOF)
-{
-
-//Count numbers in file
-i=i+1;
-//Add all numbers in file
-temp1 = temp1+x;
-
-}
-fclose(fp);
-temp1 =temp1/(i-1);
-return temp1;
-
-}
+plt.plot(x.T,cdf(x))
+plt.plot(x[0:40].T,CF,"o")
+plt.grid()
+plt.xlabel('$x$')
+plt.ylabel('$F_X(x)$')
+plt.legend(["Theory","Numerical"])
+plt.savefig("../figs/gauss_cdf.pdf")
+plt.savefig("../figs/gauss_cdf.eps")
+plt.show()
